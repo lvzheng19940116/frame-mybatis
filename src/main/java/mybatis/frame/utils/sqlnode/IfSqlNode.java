@@ -2,6 +2,7 @@ package mybatis.frame.utils.sqlnode;
 
 
 import mybatis.frame.utils.sqlnode.iface.SqlNode;
+import mybatis.frame.utils.util.OgnlUtils;
 
 /**
  *
@@ -30,6 +31,12 @@ public class IfSqlNode implements SqlNode {
 
     @Override
     public void apply(DynamicContext context) {
+        Object parameter = context.getBindings().get("_parameter");
+        boolean evaluateBoolean = OgnlUtils.evaluateBoolean(test, parameter);
+        if (evaluateBoolean){
+            // 递归去解析子节点
+            rootSqlNode.apply(context);
+        }
 
     }
 }

@@ -1,5 +1,6 @@
 package mybatis.frame.test;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import mybatis.frame.bean.Emp;
 import mybatis.frame.utils.config.Configuration;
@@ -12,6 +13,8 @@ import mybatis.frame.utils.sqlnode.iface.SqlNode;
 import mybatis.frame.utils.sqlsource.DynamicSqlSource;
 import mybatis.frame.utils.sqlsource.RawSqlSource;
 import mybatis.frame.utils.sqlsource.iface.SqlSource;
+import mybatis.frame.utils.sqlsource.model.BoundSql;
+import mybatis.frame.utils.sqlsource.model.ParameterMapping;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -65,8 +68,8 @@ public  class Mybatis02 {
         param.put("eid","1");
 
         // 调用公共方法，查询用户信息
-        List<Emp> emps = selectList("test.queryUserByParams",param);
-        log.info("解析xml{}",emps);
+        List<Emp> emps = selectList("test.selectByEmp",param);
+        log.info("解析xml：{}", JSON.toJSONString(emps));
     }
 
     /**
@@ -343,13 +346,14 @@ public  class Mybatis02 {
             // 1.获取连接
             connection = getConnection();
 
-            // TODO 2.获取SQL语句(SqlSource和SqlNode的执行过程)
-            String sql = getSql();
+            //  2.获取SQL语句(SqlSource和SqlNode的执行过程)
+            BoundSql boundSql = getSql(mappedStatement,param);
+            String sql=boundSql.getSql();
             // 3.创建Statement对象
             statement = createStatement(connection,sql,mappedStatement);
 
-            // TODO 4.设置参数
-            setParameters(statement,param);
+            //  4.设置参数
+            setParameters(statement,param,boundSql);
 
             // 5.执行Statement
             rs = handleStatement(statement);
@@ -393,8 +397,10 @@ public  class Mybatis02 {
         }
         return null;
     }
-    private String getSql() {
-        return null;
+    private BoundSql getSql(MappedStatement mappedStatement,Object param) {
+        SqlSource sqlSource=mappedStatement.getSqlSource();
+        BoundSql boundSql = sqlSource.getBoundSql(param);
+        return boundSql;
     }
     /**
      * 创建Statement对象
@@ -424,14 +430,31 @@ public  class Mybatis02 {
      * @param param
      * @throws Exception
      */
-    private void setParameters(Statement statement, Object param) throws Exception{
+    private void setParameters(Statement statement, Object param, BoundSql boundSql) throws Exception{
         if (statement instanceof PreparedStatement){
             PreparedStatement preparedStatement = (PreparedStatement) statement;
             if (param instanceof Integer || param instanceof String){
                 preparedStatement.setObject(1, param);
             }else if (param instanceof Map){
+                Map paramMap = (Map) param;
                 // TODO 结合#{}的处理逻辑进行改造
+                List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+                for (int i = 0 ; i<parameterMappings.size() ;i++) {
+                    ParameterMapping parameterMapping = parameterMappings.get(i);
+                    String name = parameterMapping.getName();
+                    // 获取到的参数
+                    Object value = paramMap.get(name);
+                    // 获取到的value对应的Java类型
+                    Class type = parameterMapping.getType();
+                    if (type != null){
+                        //TODO
+                        // preparedStatement.setInt(i+1, value);
+                        // preparedStatement.setString(i+1, value);
 
+                    }else{
+                        preparedStatement.setObject(i+1, value);
+                    }
+                }
             }else{
                 //TODO
             }

@@ -4,10 +4,10 @@
 		<environment id="dev">
 			<!-- 配置数据源信息 -->
 			<dataSource type="DBCP">
-				<property name="driver" value="com.mysql.jdbc.Driver"></property>
-				<property name="url" value="jdbc:mysql://127.0.0.1:3306/fly"></property>
-				<property name="username" value="root"></property>
-				<property name="password" value="root"></property>
+				<property name="db.driver" value="com.mysql.jdbc.Driver"></property>
+				<property name="db.url" value="jdbc:mysql://127.0.0.1:3306/fly"></property>
+				<property name="db.username" value="root"></property>
+				<property name="db.password" value="root"></property>
 			</dataSource>
 		</environment>
 	</environments>

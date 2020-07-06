@@ -1,7 +1,6 @@
 <mapper namespace="test" >
   <select id="selectByEmp" resultType="mybatis.frame.bean.Emp" statementType="prepared">
-    select eid, name, money, effort, sect, age, date1, date2 from emp
-    where eid = #{eid} and name like '%${name}'
+    select eid, name, money, effort, sect, age, date1, date2 from emp where eid = #{eid} and name like '%${name}'
     <if test="name != null and name !='' ">
       AND name like '%${name}'
       <if test="name != null and name !=''">

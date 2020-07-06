@@ -23,6 +23,7 @@ public class MappedStatement {
         this.sqlSource = sqlSource;
     }
 
+
     public Class getResultClass() {
         return resultClass;
     }

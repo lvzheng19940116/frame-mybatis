@@ -19,5 +19,8 @@ public class ParameterMapping {
      * #{}对于的参数的参数类型
      */
     private  Class type;
+    public ParameterMapping(String name) {
+        this.name = name;
+    }
 
 }
